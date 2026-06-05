@@ -11,8 +11,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user || !user.emailVerified) {
-        if (user) await signOut(auth)
+      if (!user) {
         router.push('/login')
       }
     })

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import { auth, db } from '@/lib/firebase'
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification, signOut } from 'firebase/auth'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import { Activity, Mail, Lock, User as UserIcon, Building, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -24,7 +24,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser && currentUser.emailVerified) {
+      if (currentUser) {
         router.push('/dashboard')
       } else {
         setLoading(false)
@@ -46,13 +46,7 @@ export default function LoginPage() {
     }
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      if (!userCredential.user.emailVerified) {
-        await signOut(auth)
-        setError('Please verify your email address before logging in. Check your inbox for the verification link.')
-        setIsSubmitting(false)
-        return
-      }
+      await signInWithEmailAndPassword(auth, email, password)
       // Router will handle redirect in onAuthStateChanged
     } catch (err: any) {
       setError(err.message || 'Failed to login')
@@ -80,13 +74,7 @@ export default function LoginPage() {
         createdAt: new Date().toISOString()
       })
       
-      // Send verification email and sign them out immediately
-      await sendEmailVerification(userCredential.user)
-      await signOut(auth)
-      
-      setSuccess('Registration successful! Please check your email inbox to verify your account before logging in.')
-      setActiveTab('login')
-      setIsSubmitting(false)
+      // Router will handle redirect in onAuthStateChanged
     } catch (err: any) {
       setError(err.message || 'Failed to register')
       setIsSubmitting(false)
