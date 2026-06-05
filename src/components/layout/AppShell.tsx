@@ -1,3 +1,4 @@
+"use client"
 import { Sidebar } from './Sidebar'
 import { TopNav } from './TopNav'
 import { useEffect } from 'react'
