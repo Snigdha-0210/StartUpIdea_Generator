@@ -24,11 +24,7 @@ export const aiValidationService = {
 
   async discoverOpportunities(industry: string = 'General Tech', level: string = 'Global') {
     try {
-      let numGaps = 20;
-      if (level === 'Global') numGaps = 50;
-      else if (level === 'Continent') numGaps = 40;
-      else if (level === 'Country') numGaps = 30;
-      else numGaps = 20;
+      const numGaps = 50;
 
       const prompt = `You are InnovateX AI, a hyper-local startup analyst. The user is analyzing the market: "${industry}".
 Your critical task is to return a comprehensive database of EXACTLY ${numGaps} Top Market Gaps for this specific region. You MUST generate ${numGaps} items.
