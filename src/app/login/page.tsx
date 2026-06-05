@@ -36,6 +36,14 @@ export default function LoginPage() {
     e.preventDefault()
     setIsSubmitting(true)
     setError('')
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address with a proper domain (e.g., .com, .net).');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password)
       // Router will handle redirect in onAuthStateChanged
@@ -49,6 +57,14 @@ export default function LoginPage() {
     e.preventDefault()
     setIsSubmitting(true)
     setError('')
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address with a proper domain (e.g., .com, .net).');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       await setDoc(doc(db, 'users', userCredential.user.uid), {
