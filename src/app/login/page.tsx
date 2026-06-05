@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import { auth, db } from '@/lib/firebase'
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification, signOut } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import { Activity, Mail, Lock, User as UserIcon, Building, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -20,10 +20,11 @@ export default function LoginPage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
+      if (currentUser && currentUser.emailVerified) {
         router.push('/dashboard')
       } else {
         setLoading(false)
@@ -45,7 +46,13 @@ export default function LoginPage() {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      if (!userCredential.user.emailVerified) {
+        await signOut(auth)
+        setError('Please verify your email address before logging in. Check your inbox for the verification link.')
+        setIsSubmitting(false)
+        return
+      }
       // Router will handle redirect in onAuthStateChanged
     } catch (err: any) {
       setError(err.message || 'Failed to login')
@@ -72,7 +79,14 @@ export default function LoginPage() {
         email,
         createdAt: new Date().toISOString()
       })
-      // Router will handle redirect in onAuthStateChanged
+      
+      // Send verification email and sign them out immediately
+      await sendEmailVerification(userCredential.user)
+      await signOut(auth)
+      
+      setSuccess('Registration successful! Please check your email inbox to verify your account before logging in.')
+      setActiveTab('login')
+      setIsSubmitting(false)
     } catch (err: any) {
       setError(err.message || 'Failed to register')
       setIsSubmitting(false)
@@ -122,6 +136,12 @@ export default function LoginPage() {
             {error && (
               <div className="p-3 mb-6 text-sm font-medium text-red-600 bg-red-500/10 border border-red-500/20 rounded-lg text-center">
                 {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="p-3 mb-6 text-sm font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-center">
+                {success}
               </div>
             )}
 

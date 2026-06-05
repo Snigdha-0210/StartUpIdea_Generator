@@ -1,7 +1,23 @@
 import { Sidebar } from './Sidebar'
 import { TopNav } from './TopNav'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { auth } from '@/lib/firebase'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user || !user.emailVerified) {
+        if (user) await signOut(auth)
+        router.push('/login')
+      }
+    })
+    return () => unsubscribe()
+  }, [router])
+
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />
