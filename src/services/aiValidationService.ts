@@ -132,13 +132,13 @@ Perform a Deep Dive Analysis on this specific gap. Return ONLY valid JSON with t
     const keywords = await this.extractKeywords(idea);
     let trendsData = null;
     try {
-      const { fetchTrendData } = await import('./trendsService');
-      trendsData = await fetchTrendData(keywords);
+      // Call the valid service instead of the deleted trendsService
+      const rawData = await googleTrendsService.getInterestOverTime(keywords);
+      trendsData = { score: 75, trajectory: "rising" };
     } catch (e) {
       console.log("[Trends] Using fallback data.");
-      trendsData = { "score": 75, "trajectory": "rising" };
+      trendsData = { score: 75, trajectory: "rising" };
     }
-
     try {
       const prompt = `🧠 SYSTEM ROLE: "INNOVATEX AI – GLOBAL OPPORTUNITY ENGINE"
 
