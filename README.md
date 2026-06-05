@@ -1,6 +1,6 @@
 # InnovateX AI 🚀 (StartUpIdea_Generator)
 
-**🔴 LIVE DEMO:** [View the Live Application Here](https://startupidea-generator.vercel.app/) *(Update this URL if Vercel generated a slightly different one!)*
+**🔴 LIVE DEMO:** [View the Live Application Here](https://start-up-idea-generator.vercel.app/)
 
 InnovateX AI is an advanced, AI-powered platform designed to act as your ultimate co-founder. It accelerates the entire entrepreneurial journey—from ideation and market validation to patent research and finding venture capital.
 
