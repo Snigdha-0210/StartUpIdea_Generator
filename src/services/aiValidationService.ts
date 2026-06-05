@@ -128,7 +128,7 @@ Perform a Deep Dive Analysis on this specific gap. Return ONLY valid JSON with t
     }
   },
 
-  async validateIdea(idea: string, industry: string = 'Any', skills: string = 'Beginner / No-Code', targetScope: string = 'Global', specificLocation: string = 'Worldwide', budget: string = '$0 (Bootstrapping)', time: string = 'Weekends Only') {
+  async validateIdea(idea: string, industry: string = 'Any', targetScope: string = 'Global', specificLocation: string = 'Worldwide', budget: string = '$0 (Bootstrapping)', time: string = 'Weekends Only') {
     const keywords = await this.extractKeywords(idea);
     let trendsData = null;
     try {
@@ -168,7 +168,7 @@ Use logic based on current market trends. If real-time data is missing, clearly 
 Think like a Y Combinator partner + VC analyst. Prioritize problems over ideas. Focus on real inefficiencies in the world. Avoid generic ideas like "AI app" unless specific use-case exists. Prefer "boring but profitable" opportunities. Always connect ideas to real-world signals.
 
 USER INPUT (Industry / Problem Area): "${idea}"
-Constraints: Budget: ${budget}, Time: ${time}, Skills: ${skills}, Location Focus: ${specificLocation} (${targetScope})
+Constraints: Budget: ${budget}, Time: ${time}, Location Focus: ${specificLocation} (${targetScope})
 
 🔥 OUTPUT FORMAT (STRICT JSON)
 You MUST return ONLY a raw JSON object. Do not wrap in markdown or backticks.

@@ -11,7 +11,6 @@ export default function StartupGeneratorPage() {
   const [formData, setFormData] = useState({
     idea: 'Creator Economy & Education',
     industry: 'Education & Writing',
-    skills: 'Beginner / No-Code',
     targetScope: 'Country-Specific',
     specificLocation: 'United States',
     budget: '$0 (Bootstrapping)',
@@ -99,16 +98,6 @@ export default function StartupGeneratorPage() {
               </select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Founder Skills:</label>
-              <select name="skills" value={formData.skills} onChange={handleChange} className="w-full p-2 rounded-md border outline-none bg-background">
-                <option>Beginner / No-Code</option>
-                <option>Sales & Marketing</option>
-                <option>Design & Creative</option>
-                <option>Software Developer</option>
-                <option>Industry Expert</option>
-              </select>
-            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
