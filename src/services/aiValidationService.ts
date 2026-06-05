@@ -28,7 +28,7 @@ export const aiValidationService = {
 
       const prompt = `You are InnovateX AI, a hyper-local startup analyst. The user is analyzing the market: "${industry}".
 Your critical task is to return a comprehensive database of EXACTLY ${numGaps} Top Market Gaps for this specific region. You MUST generate ${numGaps} items.
-Ignore generic SaaS advice and deeply analyze the **physical, socioeconomic, infrastructural, and geographical reality**.
+Keep the descriptions extremely concise (under 12 words) for maximum speed. Ignore generic SaaS advice.
 
 Return ONLY valid JSON with this exact structure (An ARRAY of gap objects):
 [
@@ -39,7 +39,7 @@ Return ONLY valid JSON with this exact structure (An ARRAY of gap objects):
 ]`;
       const response = await groq.chat.completions.create({
         messages: [{ role: 'user', content: prompt }],
-        model: 'llama-3.3-70b-versatile',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.5,
         max_tokens: 8000
       });
