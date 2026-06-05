@@ -24,51 +24,48 @@ export const aiValidationService = {
 
   async discoverOpportunities(industry: string = 'General Tech', level: string = 'Global') {
     try {
-      const numGaps = 50;
-
-      const prompt = `You are InnovateX AI, a hyper-local startup analyst. The user is analyzing the market: "${industry}".
-Your critical task is to return a comprehensive database of EXACTLY ${numGaps} Top Market Gaps for this specific region. You MUST generate ${numGaps} items.
-Keep the descriptions extremely concise (under 12 words) for maximum speed. Ignore generic SaaS advice.
+      // Fire 5 parallel requests of 10 items each to bypass Vercel's 10-second timeout
+      const promises = Array.from({ length: 5 }).map((_, i) => {
+        const prompt = `You are InnovateX AI, a hyper-local startup analyst. The user is analyzing the market: "${industry}".
+Your critical task is to return a database of EXACTLY 10 Top Market Gaps.
+Batch ID: ${i}. Ensure these 10 ideas are completely unique and different from standard answers.
+Keep the descriptions extremely concise (under 12 words) for speed.
 
 Return ONLY valid JSON with this exact structure (An ARRAY of gap objects):
 [
   {
-    "gap_identified": "<A highly specific description of the market gap based on real constraints>",
+    "gap_identified": "<A highly specific description of the market gap>",
     "short_title": "<A punchy 3-5 word title for this gap>"
   }
 ]`;
-      const response = await groq.chat.completions.create({
-        messages: [{ role: 'user', content: prompt }],
-        model: 'llama-3.1-8b-instant',
-        temperature: 0.5,
-        max_tokens: 8000
+        return groq.chat.completions.create({
+          messages: [{ role: 'user', content: prompt }],
+          model: 'llama-3.1-8b-instant',
+          temperature: 0.8,
+          max_tokens: 1500
+        }).then(res => {
+          let text = res.choices[0]?.message?.content || "[]";
+          const firstBracket = text.indexOf('[');
+          if (firstBracket !== -1) text = text.substring(firstBracket);
+          const lastBracket = text.lastIndexOf(']');
+          if (lastBracket !== -1) text = text.substring(0, lastBracket + 1);
+          return JSON.parse(text);
+        }).catch(e => {
+          console.error("Parallel batch failed", e);
+          return [];
+        });
       });
-      let text = response.choices[0]?.message?.content || "[]";
-      
-      // Strip conversational prefix (find first '[')
-      const firstBracket = text.indexOf('[');
-      if (firstBracket !== -1) {
-        text = text.substring(firstBracket);
+
+      const results = await Promise.all(promises);
+      const allGaps = results.flat();
+
+      if (allGaps.length === 0) {
+        throw new Error("All parallel generation batches failed.");
       }
       
-      try {
-        return JSON.parse(text);
-      } catch (parseError) {
-        // If it hit the token limit and truncated the JSON array, try to salvage it
-        console.warn("[Validation] JSON parse failed, attempting to salvage truncated array...");
-        // Find the last complete object closing brace '}'
-        const lastBraceIndex = text.lastIndexOf('}');
-        if (lastBraceIndex !== -1) {
-          const salvagedText = text.substring(0, lastBraceIndex + 1) + ']';
-          try {
-            return JSON.parse(salvagedText);
-          } catch (salvageError) {
-             console.error("[Validation] Salvage failed.");
-             throw salvageError; // Fall to outer catch
-          }
-        }
-        throw parseError;
-      }
+      // Ensure we cap at exactly 50 if it generated more
+      return allGaps.slice(0, 50);
+
     } catch (e) {
       console.error("[Validation] discoverOpportunities failed:", e);
       return [{ 
